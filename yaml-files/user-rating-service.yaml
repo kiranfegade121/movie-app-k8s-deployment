@@ -1,0 +1,60 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: user-rating-service-cm
+data:
+  MONGO_HOST: mongodb-svc
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-rating-service
+  labels:
+    app: user-rating-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-rating-service
+  template:
+    metadata:
+      labels:
+        app: user-rating-service
+    spec:
+      containers:
+        - name: user-rating-service
+          image: amitfegade121/user-rating-service:latest
+          ports:
+            - containerPort: 8082
+          env:
+            - name: MONGO_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: user-rating-service-cm
+                  key: MONGO_HOST
+            -name: MONGO_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: MONGO_USERNAME
+            - name: MONGO_PASSWORD
+              valueFrom: 
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: MONGO_PASSWORD
+                  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-rating-service
+spec:
+  selector:
+    app: user-rating-service  
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8082   
+  
+  
