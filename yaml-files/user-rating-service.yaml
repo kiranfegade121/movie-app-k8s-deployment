@@ -33,7 +33,7 @@ spec:
                 configMapKeyRef:
                   name: user-rating-service-cm
                   key: MONGO_HOST
-            -name: MONGO_USERNAME
+            - name: MONGO_USERNAME
               valueFrom:
                 secretKeyRef:
                   name: mongodb-secret
